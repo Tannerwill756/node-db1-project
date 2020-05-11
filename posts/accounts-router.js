@@ -68,12 +68,27 @@ router.put("/:id", (req, res) => {
         if (req.body.name && typeof req.body.budget != "string") {
           res.status(201).json({ data: count });
         } else {
-          res
-            .status(404)
-            .json({
-              message: "Please include a name and budget that is an integer",
-            });
+          res.status(404).json({
+            message: "Please include a name and budget that is an integer",
+          });
         }
+      } else {
+        res.status(404).json({ message: "record not found by that id" });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ messag: err.message });
+    });
+});
+
+router.delete("/:id", (req, res) => {
+  db("accounts")
+    .where({ id: req.params.id })
+    .del()
+    .then((count) => {
+      if (count > 0) {
+        res.status(201).json({ data: count });
       } else {
         res.status(404).json({ message: "record not found by that id" });
       }
