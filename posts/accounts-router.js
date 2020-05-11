@@ -4,6 +4,7 @@ const db = require("../data/dbConfig");
 
 const router = express.Router();
 
+// GET ALL ACCOUNTS
 router.get("/", (req, res) => {
   db.select("*")
     .from("accounts")
@@ -15,6 +16,7 @@ router.get("/", (req, res) => {
     });
 });
 
+// GET SPECIFIC ACCOUNT
 router.get("/:id", (req, res) => {
   db("accounts")
     .where({ id: req.params.id })
@@ -32,6 +34,7 @@ router.get("/:id", (req, res) => {
     });
 });
 
+// POST ACCOUNT
 router.post("/", (req, res) => {
   if (req.body.name && req.body.budget) {
     if (typeof req.body.budget != "string") {
@@ -53,6 +56,32 @@ router.post("/", (req, res) => {
       .status(400)
       .json({ message: "please provide a Name and Budget for the post" });
   }
+});
+
+//UPDATE ACCOUNT
+router.put("/:id", (req, res) => {
+  db("accounts")
+    .where({ id: req.params.id })
+    .update(req.body)
+    .then((count) => {
+      if (count > 0) {
+        if (req.body.name && typeof req.body.budget != "string") {
+          res.status(201).json({ data: count });
+        } else {
+          res
+            .status(404)
+            .json({
+              message: "Please include a name and budget that is an integer",
+            });
+        }
+      } else {
+        res.status(404).json({ message: "record not found by that id" });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ messag: err.message });
+    });
 });
 
 module.exports = router;
